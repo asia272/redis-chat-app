@@ -6,6 +6,7 @@ import {
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { useEffect, useState } from "react";
+import Sidebar from "../Sidebar";
 
 interface ChatLayoutProps {
     defaultLayout?: number[];
@@ -15,6 +16,7 @@ export default function ChatLayout({
     defaultLayout = [320, 480],
 }: ChatLayoutProps) {
     const [isMobile, setIsMobile] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -44,16 +46,19 @@ export default function ChatLayout({
         >
             <ResizablePanel
                 defaultSize={defaultLayout[0]}
-                minSize={isMobile ? 0 : 200}
+                collapsedSize={8}
+                collapsible={true}
+                minSize={isMobile ? 0 : 24}
+                maxSize={isMobile ? 8 : 30}
             >
-                Left Panel
+                <Sidebar />
             </ResizablePanel>
 
             <ResizableHandle withHandle />
 
             <ResizablePanel
                 defaultSize={defaultLayout[1]}
-                minSize={300}
+                minSize={30}
             >
                 Right Panel
             </ResizablePanel>
