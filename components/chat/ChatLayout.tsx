@@ -13,7 +13,7 @@ interface ChatLayoutProps {
 }
 
 export default function ChatLayout({
-    defaultLayout = [320, 480],
+    defaultLayout = [25, 75],
 }: ChatLayoutProps) {
     const [isMobile, setIsMobile] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -23,13 +23,10 @@ export default function ChatLayout({
             setIsMobile(window.innerWidth <= 768);
         };
 
-        // Check once on mount
         checkScreenSize();
 
-        // Listen for resize
         window.addEventListener("resize", checkScreenSize);
 
-        // Cleanup
         return () => {
             window.removeEventListener("resize", checkScreenSize);
         };
@@ -47,11 +44,20 @@ export default function ChatLayout({
             <ResizablePanel
                 defaultSize={defaultLayout[0]}
                 collapsedSize={8}
-                collapsible={true}
+                collapsible
                 minSize={isMobile ? 0 : 24}
                 maxSize={isMobile ? 8 : 30}
+                onResize={(size: any) => {
+                    const collapsed = size === 8;
+
+                    if (collapsed !== isCollapsed) {
+                        setIsCollapsed(collapsed);
+
+                        document.cookie = `react-resizable-panels:collapsed=${collapsed}; path=/`;
+                    }
+                }}
             >
-                <Sidebar />
+                <Sidebar isCollapsed={isCollapsed} />
             </ResizablePanel>
 
             <ResizableHandle withHandle />
