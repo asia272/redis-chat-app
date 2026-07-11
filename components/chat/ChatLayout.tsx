@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/resizable";
 import { useEffect, useState } from "react";
 import Sidebar from "../Sidebar";
+import MessageContainer from "./MessageContainer";
 
 interface ChatLayoutProps {
     defaultLayout?: number[];
@@ -66,7 +67,7 @@ export default function ChatLayout({
                 defaultSize={defaultLayout[1]}
                 minSize={30}
             >
-                Right Panel
+                <MessageContainer />
             </ResizablePanel>
         </ResizablePanelGroup>
     );
