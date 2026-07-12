@@ -6,13 +6,28 @@ import EmojiPicker from './EmojiPicker'
 import useSound from 'use-sound'
 import { Button } from '../ui/button'
 import { Loader, SendHorizontal, ThumbsUp } from 'lucide-react'
+import { usePreferencesStore } from '@/store/usePreferences'
 
 const ChatBottomBar = () => {
 
     const [message, setMessage] = useState("");
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
-    const isPending = true;
+    const isPending = false;
 
+    const { soundEnabled } = usePreferencesStore();
+
+    const [playSound1] = useSound("/sounds/keystroke1.mp3");
+    const [playSound2] = useSound("/sounds/keystroke2.mp3");
+    const [playSound3] = useSound("/sounds/keystroke3.mp3");
+    const [playSound4] = useSound("/sounds/keystroke4.mp3");
+
+
+    const playSoundFunctions = [playSound1, playSound2, playSound3, playSound4];
+
+    const playRandomKeyStrokeSound = () => {
+        const randomIndex = Math.floor(Math.random() * playSoundFunctions.length);
+        soundEnabled && playSoundFunctions[randomIndex]();
+    };
 
     return (
         <div className='p-2 flex justify-between w-full items-center gap-2'>
@@ -40,6 +55,7 @@ const ChatBottomBar = () => {
                         value={message}
                         onChange={(e) => {
                             setMessage(e.target.value);
+                            playRandomKeyStrokeSound()
                         }}
                         ref={textAreaRef}
 
