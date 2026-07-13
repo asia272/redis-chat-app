@@ -1,11 +1,17 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import AuthButtons from "./AuthButtons";
-
+import { getCurrentUser } from "@/app/actions/auth.actions";
 import { redirect } from "next/navigation";
 
-const page = async () => {
 
+
+const page = async () => {
+    const { success } = await getCurrentUser();
+
+    if (success) {
+        redirect("/");
+    }
 
     return (
         <div className='flex h-screen w-full'>

@@ -1,12 +1,19 @@
 import ChatLayout from "@/components/chat/ChatLayout";
 import PreferencesTab from "@/components/PreferencesTab";
 import { cookies } from "next/headers";
+import { getAllUsers } from "./actions/auth.actions";
+import { redirect } from "next/navigation";
 
 
 export default async function Home() {
   const cookieStore = await cookies();
 
   const layout = cookieStore.get("react-resizable-panels:layout");
+  const { success, users } = await getAllUsers()
+
+  if (!success) {
+    redirect("/auth");
+  }
 
   const defaultLayout = layout
     ? JSON.parse(layout.value)
@@ -22,7 +29,7 @@ export default async function Home() {
         aria-hidden='true'
       />
       <div className='z-10 border rounded-lg max-w-5xl w-full min-h-[85vh] text-sm lg:flex'>
-        <ChatLayout defaultLayout={defaultLayout} />
+        <ChatLayout defaultLayout={defaultLayout} users={users} />
       </div>
     </main>
   );

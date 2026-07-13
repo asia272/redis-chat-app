@@ -7,24 +7,20 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { usePreferencesStore } from '@/store/usePreferences';
 import useSound from 'use-sound';
 import { cn } from '@/lib/utils';
+import { LogoutLink, useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
+import { LogOut } from 'lucide-react';
 
-
-const users = [
-    { id: "1", name: "Alice Johnson", imageUrl: "https://i.pravatar.cc/150?img=1" },
-    { id: "2", name: "Bob Smith", imageUrl: "https://i.pravatar.cc/150?img=2" },
-    { id: "3", name: "Charlie Brown", imageUrl: "https://i.pravatar.cc/150?img=3" },
-    { id: "4", name: "David Wilson", imageUrl: "https://i.pravatar.cc/150?img=4" },
-    { id: "5", name: "Emma Davis", imageUrl: "https://i.pravatar.cc/150?img=5" },
-];
 
 interface SidebarProps {
     isCollapsed: boolean;
-
+    users: any[];
 }
-const Sidebar = ({ isCollapsed }: SidebarProps) => {
-    const { soundEnabled, setSoundEnabled } = usePreferencesStore();
+const Sidebar = ({ isCollapsed, users }: SidebarProps) => {
 
+    const { soundEnabled, setSoundEnabled } = usePreferencesStore();
+    const { user } = useKindeBrowserClient();
     const [playClick] = useSound("/sounds/mouse-click.mp3");
+
     return (
         <div className='group relative flex flex-col h-full gap-4 p-2 data-[collapsed=true]:p-2  max-h-full overflow-auto bg-background'>
             {!isCollapsed && (
@@ -49,17 +45,17 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                                     >
                                         <Avatar className='my-1 flex justify-center items-center'>
                                             <AvatarImage
-                                                src={user.imageUrl || "/user-placeholder.png"}
+                                                src={user.image || "/user-placeholder.png"}
                                                 alt='User Image'
                                                 className='border-2 border-white rounded-full w-10 h-10'
                                             />
-                                            <AvatarFallback>{user.name[0]}</AvatarFallback>
+                                            <AvatarFallback>{user.firstName} {user.lastName}</AvatarFallback>
                                         </Avatar>
-                                        <span className='sr-only'>{user.name}</span>
+                                        <span className='sr-only'>{user.firstName} {user.lastName}</span>
                                     </div>
                                 </TooltipTrigger>
                                 <TooltipContent side='right' className='flex items-center gap-4'>
-                                    {user.name}
+                                    {user.firstName} {user.lastName}
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -78,38 +74,41 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                         >
                             <Avatar className='flex justify-center items-center'>
                                 <AvatarImage
-                                    src={user.imageUrl || "/user-placeholder.png"}
+                                    src={user.image || "/user-placeholder.png"}
                                     alt={"User image"}
                                     className='w-10 h-10'
                                 />
-                                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                                <AvatarFallback>{user.firstName}</AvatarFallback>
                             </Avatar>
                             <div className='flex flex-col max-w-28'>
-                                <span>{user.name}</span>
+                                <span>{user.firstName} {user.lastName}</span>
                             </div>
                         </Button>
                     )
                 )}
             </ScrollArea>
+            {/* logout section */}
             <div className='mt-auto'>
                 <div className='flex justify-between items-center gap-2 md:px-6 py-2'>
                     {!isCollapsed && (
                         <div className='hidden md:flex gap-2 items-center '>
                             <Avatar className='flex justify-center items-center'>
                                 <AvatarImage
-                                    src={"/user-placeholder.png"}
+                                    src={user?.picture || "/user-placeholder.png"}
                                     alt='avatar'
                                     referrerPolicy='no-referrer'
                                     className='w-8 h-8 border-2 border-white rounded-full'
                                 />
                             </Avatar>
                             <p className='font-bold'>
-
+                                {user?.given_name} {user?.family_name}
                             </p>
                         </div>
                     )}
                     <div className='flex'>
-                        only name show here
+                        <LogoutLink>
+                            <LogOut size={22} cursor={"pointer"} />
+                        </LogoutLink>
                     </div>
                 </div>
             </div>

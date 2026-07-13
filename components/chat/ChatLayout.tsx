@@ -11,10 +11,12 @@ import MessageContainer from "./MessageContainer";
 
 interface ChatLayoutProps {
     defaultLayout?: number[];
+    users: any[];
 }
 
 export default function ChatLayout({
     defaultLayout = [25, 75],
+    users,
 }: ChatLayoutProps) {
     const [isMobile, setIsMobile] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -58,7 +60,7 @@ export default function ChatLayout({
                     }
                 }}
             >
-                <Sidebar isCollapsed={isCollapsed} />
+                <Sidebar isCollapsed={isCollapsed} users={users} />
             </ResizablePanel>
 
             <ResizableHandle withHandle />
