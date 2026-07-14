@@ -8,6 +8,7 @@ import { Button } from '../ui/button'
 import { Loader, SendHorizontal, ThumbsUp } from 'lucide-react'
 import { usePreferencesStore } from '@/store/usePreferences'
 
+
 const ChatBottomBar = () => {
 
     const [message, setMessage] = useState("");
