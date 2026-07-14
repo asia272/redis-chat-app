@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/app/actions/message.actions";
 import type { Message } from "@/app/types/message";
 import { useEffect, useRef } from "react";
+import MessageSkeleton from "../skeletons/MessageSkeleton";
 
 
 
@@ -37,7 +38,7 @@ const MessageList = () => {
             {/* This component ensure that an animation is applied when items are added to or removed from the list */}
             <AnimatePresence>
                 {
-                    data?.messages?.map((message: Message, index) => (
+                    !isLoading && data?.messages?.map((message: Message, index) => (
                         <motion.div
                             key={message.id}
                             layout
@@ -93,7 +94,13 @@ const MessageList = () => {
                             </div>
                         </motion.div>
                     ))}
-
+                {isLoading &&
+                    <>
+                        <MessageSkeleton />
+                        <MessageSkeleton />
+                        <MessageSkeleton />
+                        <MessageSkeleton />
+                    </>}
 
             </AnimatePresence>
         </div>
