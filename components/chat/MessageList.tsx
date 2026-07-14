@@ -6,6 +6,7 @@ import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/app/actions/message.actions";
 import type { Message } from "@/app/types/message";
+import { useEffect, useRef } from "react";
 
 
 
@@ -14,7 +15,7 @@ const MessageList = () => {
     const { selectedUser } = useSelectedUser()
 
     const { user: currentUser } = useKindeBrowserClient();
-
+    const messageContainerRef = useRef<HTMLDivElement>(null);
     const { data, isLoading } = useQuery({
         queryKey: ["messages", currentUser?.id, selectedUser?.id],
         queryFn: () =>
@@ -24,8 +25,15 @@ const MessageList = () => {
             }),
         enabled: !!currentUser && !!selectedUser,
     });
+    // Scroll to the bottom of the message container when new messages are added
+    useEffect(() => {
+        if (messageContainerRef.current) {
+            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+    }, [data]);
+
     return (
-        <div className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
+        <div ref={messageContainerRef} className='w-full overflow-y-auto overflow-x-hidden  flex flex-col'>
             {/* This component ensure that an animation is applied when items are added to or removed from the list */}
             <AnimatePresence>
                 {

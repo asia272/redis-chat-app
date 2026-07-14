@@ -25,7 +25,8 @@ const MessageContainer = () => {
             <div className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
                 <ChatBottomBar />
                 <MessageList />
-                {/* <ChatBottomBar /> */}
+
+
             </div>
         </div>
     )

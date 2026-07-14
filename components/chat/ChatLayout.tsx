@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../Sidebar";
 import MessageContainer from "./MessageContainer";
 import { useSelectedUser } from "@/store/useSelectedUser";
+import { cn } from "@/lib/utils";
 
 interface ChatLayoutProps {
     defaultLayout?: number[];
@@ -41,6 +42,7 @@ export default function ChatLayout({
     return (
         <ResizablePanelGroup
             direction="horizontal"
+            className='h-full items-stretch bg-background rounded-lg'
             onLayout={(sizes: number[]) => {
                 document.cookie = `react-resizable-panels:layout=${JSON.stringify(
                     sizes
@@ -62,6 +64,7 @@ export default function ChatLayout({
                         document.cookie = `react-resizable-panels:collapsed=${collapsed}; path=/`;
                     }
                 }}
+                className={cn(isCollapsed && "min-w-[80px] transition-all duration-300 ease-in-out")}
             >
                 <Sidebar isCollapsed={isCollapsed} users={users} />
             </ResizablePanel>

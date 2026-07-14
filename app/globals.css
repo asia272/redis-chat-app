@@ -121,10 +121,29 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
+  }
+}
+
+/* rounded cool looking scrollbar */
+@layer components {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: hsl(var(--background));
   }
 }
