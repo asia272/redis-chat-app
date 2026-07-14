@@ -13,7 +13,7 @@ const ChatTopBar = () => {
             <div className='flex items-center gap-2'>
                 <Avatar className='flex justify-center items-center'>
                     <AvatarImage
-                        src={selectedUser?.imageUrl || "/user-placeholder.png"}
+                        src={selectedUser?.image || "/user-placeholder.png"}
                         alt='User Image'
                         className='w-10 h-10 object-cover rounded-full'
                     />

@@ -4,7 +4,7 @@ export interface User {
     _id: string;
     firstName: string;
     lastName?: string;
-    imageUrl: string;
+    image: string;
     email: string;
 }
 
