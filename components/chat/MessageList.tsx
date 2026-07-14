@@ -1,86 +1,37 @@
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarImage } from "../ui/avatar";
+import { useSelectedUser } from "@/store/useSelectedUser";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { useQuery } from "@tanstack/react-query";
+import { getMessages } from "@/app/actions/message.actions";
+import type { Message } from "@/app/types/message";
 
-const messages = [
-    {
-        id: "1",
-        senderId: "1",
-        messageType: "text",
-        content: "Hey! How's your day going?",
-        createdAt: "2026-07-11T09:00:00Z",
-    },
-    {
-        id: "2",
-        senderId: "2",
-        messageType: "text",
-        content: "Pretty good! Just finished working on my chat app.",
-        createdAt: "2026-07-11T09:01:00Z",
-    },
-    {
-        id: "3",
-        senderId: "1",
-        messageType: "text",
-        content: "Nice! Are you using Next.js?",
-        createdAt: "2026-07-11T09:02:00Z",
-    },
-    {
-        id: "4",
-        senderId: "2",
-        messageType: "text",
-        content: "Yep! Next.js, Convex, Clerk, and shadcn/ui.",
-        createdAt: "2026-07-11T09:03:00Z",
-    },
-    {
-        id: "5",
-        senderId: "1",
-        messageType: "image",
-        content: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600",
-        createdAt: "2026-07-11T09:04:00Z",
-    },
-    {
-        id: "6",
-        senderId: "2",
-        messageType: "text",
-        content: "Nice workspace! 🔥",
-        createdAt: "2026-07-11T09:05:00Z",
-    },
-    {
-        id: "7",
-        senderId: "1",
-        messageType: "text",
-        content: "Thanks! I'm almost done building the chat UI.",
-        createdAt: "2026-07-11T09:06:00Z",
-    },
-    {
-        id: "8",
-        senderId: "2",
-        messageType: "image",
-        content: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600",
-        createdAt: "2026-07-11T09:07:00Z",
-    },
-    {
-        id: "9",
-        senderId: "1",
-        messageType: "text",
-        content: "Looks awesome! 🚀",
-        createdAt: "2026-07-11T09:08:00Z",
-    },
-];
 
 
 const MessageList = () => {
 
-    const currentUser = { id: "1", name: "Alice Johnson", image: "https://i.pravatar.cc/150?img=1" }
-    const selectedUser = { id: "2", name: "Bob Smith", image: "https://i.pravatar.cc/150?img=2" }
+    const { selectedUser } = useSelectedUser()
+
+    const { user: currentUser } = useKindeBrowserClient();
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["messages", currentUser?.id, selectedUser?.id],
+        queryFn: () =>
+            getMessages({
+                senderId: currentUser!.id,
+                receiverId: selectedUser!.id,
+            }),
+        enabled: !!currentUser && !!selectedUser,
+    });
     return (
         <div className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
             {/* This component ensure that an animation is applied when items are added to or removed from the list */}
             <AnimatePresence>
                 {
-                    messages?.map((message, index) => (
+                    data?.messages?.map((message: Message, index) => (
                         <motion.div
-                            key={index}
+                            key={message.id}
                             layout
                             initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
                             animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
@@ -90,7 +41,7 @@ const MessageList = () => {
                                 layout: {
                                     type: "spring",
                                     bounce: 0.3,
-                                    duration: messages.indexOf(message) * 0.05 + 0.2,
+                                    duration: index * 0.05 + 0.2,
                                 },
                             }}
                             style={{
@@ -99,11 +50,11 @@ const MessageList = () => {
                             }}
                             className={cn(
                                 "flex flex-col gap-2 p-4 whitespace-pre-wrap",
-                                message.senderId === currentUser?.id ? "items-end" : "items-start"
+                                message?.senderId === currentUser?.id ? "items-end" : "items-start"
                             )}
                         >
                             <div className='flex gap-3 items-center'>
-                                {message.senderId === selectedUser?.id && (
+                                {message?.senderId === selectedUser?.id && (
                                     <Avatar className='flex justify-center items-center'>
                                         <AvatarImage
                                             src={selectedUser?.image}
@@ -112,7 +63,7 @@ const MessageList = () => {
                                         />
                                     </Avatar>
                                 )}
-                                {message.messageType === "text" ? (
+                                {message?.type === "text" ? (
                                     <span className='bg-accent p-3 rounded-md max-w-xs'>{message.content}</span>
                                 ) : (
                                     <img
@@ -125,7 +76,7 @@ const MessageList = () => {
                                 {message.senderId === currentUser?.id && (
                                     <Avatar className='flex justify-center items-center'>
                                         <AvatarImage
-                                            src={currentUser?.image || "/user-placeholder.png"}
+                                            src={currentUser?.picture || "/user-placeholder.png"}
                                             alt='User Image'
                                             className='border-2 border-white rounded-full'
                                         />

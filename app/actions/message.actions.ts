@@ -2,6 +2,7 @@
 
 import { redis } from "@/lib/db";
 import { randomUUID } from "crypto";
+import { Message } from "../types/message";
 
 interface SendMessageParams {
     senderId: string;
@@ -23,8 +24,7 @@ export async function sendMessage({
 
         // Check if conversation already exists
         const conversationExists = (await redis.exists(conversationKey)) === 1;
-
-        const message = {
+        const message: Message = {
             id: randomUUID(),
             senderId,
             receiverId,
@@ -32,7 +32,6 @@ export async function sendMessage({
             type,
             createdAt: Date.now(),
         };
-
         // Save message
         await redis.rpush(conversationKey, JSON.stringify(message));
 
@@ -61,6 +60,38 @@ export async function sendMessage({
         return {
             success: false,
             error: "Failed to send message.",
+        };
+    }
+}
+
+interface GetMessagesParams {
+    senderId: string;
+    receiverId: string;
+}
+
+export async function getMessages({
+    senderId,
+    receiverId,
+}: GetMessagesParams) {
+    try {
+        const conversationId = [senderId, receiverId].sort().join(":");
+
+        const conversationKey = `conversation:${conversationId}:messages`;
+
+
+        const messages = await redis.lrange<Message>(conversationKey, 0, -1);
+
+        return {
+            success: true,
+            messages,
+        };
+    } catch (error) {
+        console.error(error);
+
+        return {
+            success: false,
+            messages: [],
+            error: "Failed to fetch messages.",
         };
     }
 }

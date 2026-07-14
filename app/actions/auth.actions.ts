@@ -49,8 +49,10 @@ export async function getAllUsers() {
         };
     }
 
-    const keys = await redis.keys("user:*");
-
+    // const keys = await redis.keys("user:*");
+    const keys = (await redis.keys("user:*")).filter(
+        (key) => !key.endsWith(":conversations")
+    );
     const users = (
         await Promise.all(
             keys.map(async (key) => ({

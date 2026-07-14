@@ -7,14 +7,18 @@ import useSound from 'use-sound'
 import { Button } from '../ui/button'
 import { Loader, SendHorizontal, ThumbsUp } from 'lucide-react'
 import { usePreferencesStore } from '@/store/usePreferences'
-
+import { useMutation } from "@tanstack/react-query";
+import { sendMessage } from '@/app/actions/message.actions'
+import { useSelectedUser } from '@/store/useSelectedUser'
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 
 const ChatBottomBar = () => {
 
+    const { selectedUser } = useSelectedUser();
+    const { user } = useKindeBrowserClient();
+
     const [message, setMessage] = useState("");
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
-    const isPending = false;
-
     const { soundEnabled } = usePreferencesStore();
 
     const [playSound1] = useSound("/sounds/keystroke1.mp3");
@@ -28,6 +32,33 @@ const ChatBottomBar = () => {
     const playRandomKeyStrokeSound = () => {
         const randomIndex = Math.floor(Math.random() * playSoundFunctions.length);
         soundEnabled && playSoundFunctions[randomIndex]();
+    };
+    const { mutate: sendMessageMutation, isPending } = useMutation({
+        mutationFn: sendMessage,
+
+        onSuccess: () => {
+            setMessage("");
+
+            if (textAreaRef.current) {
+                textAreaRef.current.focus();
+            }
+        },
+
+        onError: (error) => {
+            console.error(error);
+        },
+    });
+    const handleSendMessage = () => {
+        if (!message.trim()) return;
+        if (!user) return;
+        if (!selectedUser) return;
+
+        sendMessageMutation({
+            senderId: user.id,
+            receiverId: selectedUser.id,
+            content: message,
+            type: "text",
+        });
     };
 
     return (
@@ -59,7 +90,12 @@ const ChatBottomBar = () => {
                             playRandomKeyStrokeSound()
                         }}
                         ref={textAreaRef}
-
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendMessage();
+                            }
+                        }}
                     />
                     <div className='absolute right-2 bottom-0.5'>
                         <EmojiPicker
@@ -87,6 +123,8 @@ const ChatBottomBar = () => {
                         className='h-9 w-9 dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white shrink-0'
                         variant={"ghost"}
                         size={"icon"}
+                        onClick={handleSendMessage}
+                        disabled={isPending}
                     >
                         {!isPending && (
                             <ThumbsUp
