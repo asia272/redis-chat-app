@@ -9,6 +9,7 @@ import useSound from 'use-sound';
 import { cn } from '@/lib/utils';
 import { LogoutLink, useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import { LogOut } from 'lucide-react';
+import { useSelectedUser } from '@/store/useSelectedUser';
 
 
 interface SidebarProps {
@@ -17,6 +18,7 @@ interface SidebarProps {
 }
 const Sidebar = ({ isCollapsed, users }: SidebarProps) => {
 
+    const { setSelectedUser, selectedUser } = useSelectedUser();
     const { soundEnabled, setSoundEnabled } = usePreferencesStore();
     const { user } = useKindeBrowserClient();
     const [playClick] = useSound("/sounds/mouse-click.mp3");
@@ -40,7 +42,7 @@ const Sidebar = ({ isCollapsed, users }: SidebarProps) => {
                                     <div
                                         onClick={() => {
                                             soundEnabled && playClick();
-
+                                            setSelectedUser(user);
                                         }}
                                     >
                                         <Avatar className='my-1 flex justify-center items-center'>
@@ -66,10 +68,12 @@ const Sidebar = ({ isCollapsed, users }: SidebarProps) => {
                             size='xl'
                             className={cn(
                                 "w-full justify-start gap-4 my-1",
+                                selectedUser?.email === user.email &&
+                                "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white shrink"
                             )}
                             onClick={() => {
                                 soundEnabled && playClick();
-
+                                setSelectedUser(user);
                             }}
                         >
                             <Avatar className='flex justify-center items-center'>
