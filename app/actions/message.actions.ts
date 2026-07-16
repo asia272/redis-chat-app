@@ -3,6 +3,7 @@
 import { redis } from "@/lib/db";
 import { randomUUID } from "crypto";
 import { Message } from "../types/message";
+import { pusherServer } from "@/lib/pusher";
 
 interface SendMessageParams {
     senderId: string;
@@ -34,6 +35,13 @@ export async function sendMessage({
         };
         // Save message
         await redis.rpush(conversationKey, JSON.stringify(message));
+
+        // Trigger Pusher event
+        await pusherServer.trigger(
+            conversationId,
+            "new-message",
+            message
+        );
 
         // If this is the first message, register the conversation for both users
         if (!conversationExists) {
