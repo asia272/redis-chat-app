@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import EmojiPicker from './EmojiPicker'
 import useSound from 'use-sound'
 import { Button } from '../ui/button'
-import { Loader, SendHorizontal, ThumbsUp } from 'lucide-react'
+import { ImageIcon, Loader, SendHorizontal, ThumbsUp } from 'lucide-react'
 import { usePreferencesStore } from '@/store/usePreferences'
 import { useMutation } from "@tanstack/react-query";
 import { sendMessage } from '@/app/actions/message.actions'
@@ -65,7 +65,7 @@ const ChatBottomBar = () => {
     };
 
     return (
-        <div className='p-2 flex justify-between w-full items-center gap-2'>
+        <div className="sticky bottom-0 z-30 flex w-full items-center gap-2 border-t bg-background p-3">
             {!message.trim() && (
                 <CldUploadWidget
                     signatureEndpoint="/api/sign-cloudinary-params"
@@ -85,7 +85,11 @@ const ChatBottomBar = () => {
 
                         return (
                             <button onClick={() => open()}>
-                                Upload an Image
+                                <ImageIcon
+                                    size={20}
+                                    onClick={() => open()}
+                                    className='cursor-pointer text-muted-foreground'
+                                />
                             </button>
                         );
                     }}

@@ -19,13 +19,13 @@ const MessageContainer = () => {
     }, [setSelectedUser]);
 
     return (
-        <div className='flex- flex-col justify-between w-full h-full'>
+        <div className='flex- flex-col justify-between w-full h-full overflow-y-auto overflow-x-hidden'>
             <ChatTopBar />
 
-            <div className='w-full overflow-y-auto overflow-x-hidden h-full flex flex-col'>
-                <ChatBottomBar />
-                <MessageList />
+            <div className='w-full  h-full flex flex-col'>
 
+                <MessageList />
+                <ChatBottomBar />
 
             </div>
         </div>

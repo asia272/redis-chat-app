@@ -1,34 +1,45 @@
+
 import { useSelectedUser } from "@/store/useSelectedUser";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Info, X } from "lucide-react";
-;
 
 const ChatTopBar = () => {
-
     const { selectedUser, setSelectedUser } = useSelectedUser();
 
+    if (!selectedUser) return null;
 
     return (
-        <div className='w-full h-20 flex p-4 justify-between items-center border-b'>
-            <div className='flex items-center gap-2'>
-                <Avatar className='flex justify-center items-center'>
+        <div className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background px-4">
+            <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
                     <AvatarImage
-                        src={selectedUser?.image || "/user-placeholder.png"}
-                        alt='User Image'
-                        className='w-10 h-10 object-cover rounded-full'
+                        src={selectedUser.image || "/user-placeholder.png"}
+                        alt={selectedUser.firstName}
+                        className="rounded-full object-cover"
                     />
                 </Avatar>
-                <span className='font-medium'>{selectedUser?.firstName}</span>
+
+                <div>
+                    <h2 className="truncate font-semibold">
+                        {selectedUser.firstName}
+                    </h2>
+                </div>
             </div>
 
-            <div className='flex gap-2'>
-                <Info className='text-muted-foreground cursor-pointer hover:text-primary' />
-                <X
-                    className='text-muted-foreground cursor-pointer hover:text-primary'
+            <div className="flex items-center gap-3">
+                <button className="rounded-md p-2 hover:bg-muted">
+                    <Info className="h-5 w-5 text-muted-foreground" />
+                </button>
+
+                <button
                     onClick={() => setSelectedUser(null)}
-                />
+                    className="rounded-md p-2 hover:bg-muted"
+                >
+                    <X className="h-5 w-5 text-muted-foreground" />
+                </button>
             </div>
         </div>
     );
 };
+
 export default ChatTopBar;
