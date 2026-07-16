@@ -37,8 +37,8 @@ const Sidebar = ({ isCollapsed, users }: SidebarProps) => {
                 {users.map((user, idx) =>
                     isCollapsed ? (
                         <TooltipProvider key={idx}>
-                            <Tooltip delayDuration={0}>
-                                <TooltipTrigger asChild>
+                            <Tooltip>
+                                <TooltipTrigger>
                                     <div
                                         onClick={() => {
                                             soundEnabled && playClick();
