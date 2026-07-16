@@ -3,20 +3,21 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { useSelectedUser } from "@/store/useSelectedUser";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-import { useQuery } from "@tanstack/react-query";
+import { QueryClient, useQuery } from "@tanstack/react-query";
 import { getMessages } from "@/app/actions/message.actions";
 import type { Message } from "@/app/types/message";
 import { useEffect, useRef } from "react";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
 
 
-
 const MessageList = () => {
 
     const { selectedUser } = useSelectedUser()
 
+
     const { user: currentUser } = useKindeBrowserClient();
     const messageContainerRef = useRef<HTMLDivElement>(null);
+
     const { data, isLoading } = useQuery({
         queryKey: ["messages", currentUser?.id, selectedUser?.id],
         queryFn: () =>

@@ -1,13 +1,7 @@
 import PusherServer from "pusher";
-import PusherClient from "pusher-js";
-
-
-
-
 
 declare global {
     var pusherServer: PusherServer | undefined;
-    var pusherClient: PusherClient | undefined;
 }
 
 // Server-side Pusher
@@ -19,12 +13,3 @@ export const pusherServer = global.pusherServer || new PusherServer({
     cluster: "ap2",
     useTLS: true,
 });
-
-// Client-side Pusher
-
-export const pusherClient = global.pusherClient || new PusherClient(
-    process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
-    {
-        cluster: "ap2",
-    }
-);

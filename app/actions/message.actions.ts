@@ -3,7 +3,7 @@
 import { redis } from "@/lib/db";
 import { randomUUID } from "crypto";
 import { Message } from "../types/message";
-import { pusherServer } from "@/lib/pusher";
+import { pusherServer } from "@/lib/pusher-server";
 
 interface SendMessageParams {
     senderId: string;
@@ -23,6 +23,10 @@ export async function sendMessage({
 
         const conversationKey = `conversation:${conversationId}:messages`;
 
+        const channelName = `conversation-${[senderId, receiverId]
+            .sort()
+            .join("-")}`;
+
         // Check if conversation already exists
         const conversationExists = (await redis.exists(conversationKey)) === 1;
         const message: Message = {
@@ -38,7 +42,7 @@ export async function sendMessage({
 
         // Trigger Pusher event
         await pusherServer.trigger(
-            conversationId,
+            channelName,
             "new-message",
             message
         );

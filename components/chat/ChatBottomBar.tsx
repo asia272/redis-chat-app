@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Textarea } from '../ui/textarea'
 import { AnimatePresence } from 'framer-motion'
 import { motion } from "framer-motion"
@@ -7,18 +7,22 @@ import useSound from 'use-sound'
 import { Button } from '../ui/button'
 import { ImageIcon, Loader, SendHorizontal, ThumbsUp } from 'lucide-react'
 import { usePreferencesStore } from '@/store/usePreferences'
-import { useMutation } from "@tanstack/react-query";
 import { sendMessage } from '@/app/actions/message.actions'
 import { useSelectedUser } from '@/store/useSelectedUser'
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { CldUploadWidget } from "next-cloudinary";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import Image from 'next/image'
+import { pusherClient } from "@/lib/pusher-client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Message } from '@/app/types/message'
 
 const ChatBottomBar = () => {
 
     const { selectedUser } = useSelectedUser();
     const { user } = useKindeBrowserClient();
+    const queryClient = useQueryClient();
+
 
     const [message, setMessage] = useState("");
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -28,7 +32,7 @@ const ChatBottomBar = () => {
     const [playSound2] = useSound("/sounds/keystroke2.mp3");
     const [playSound3] = useSound("/sounds/keystroke3.mp3");
     const [playSound4] = useSound("/sounds/keystroke4.mp3");
-
+    const [playNotificationSound] = useSound("/sounds/notification.mp3");
 
     const playSoundFunctions = [playSound1, playSound2, playSound3, playSound4];
 
@@ -63,6 +67,46 @@ const ChatBottomBar = () => {
             type: "text",
         });
     };
+    // for pusher 
+    useEffect(() => {
+        if (!user || !selectedUser) return;
+
+        const channelName = `conversation-${[user.id, selectedUser.id]
+            .sort()
+            .join("-")}`;
+
+        const channel = pusherClient.subscribe(channelName);
+
+        const handleNewMessage = (message: Message) => {
+            if (soundEnabled && message.senderId !== user?.id) {
+                playNotificationSound();
+            }
+
+            queryClient.setQueryData(
+                ["messages", user?.id, selectedUser?.id],
+                (oldData: any) => {
+                    if (!oldData) {
+                        return {
+                            success: true,
+                            messages: [message],
+                        };
+                    }
+
+                    return {
+                        ...oldData,
+                        messages: [...oldData.messages, message],
+                    };
+                }
+            );
+        };
+
+        channel.bind("new-message", handleNewMessage);
+
+        return () => {
+            channel.unbind_all();
+            pusherClient.unsubscribe(channelName);
+        };
+    }, [user, selectedUser, queryClient]);
 
     return (
         <div className="sticky bottom-0 z-30 flex w-full items-center gap-2 border-t bg-background p-3">
